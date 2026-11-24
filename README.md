@@ -10,10 +10,11 @@ A paper-trading bot for the pump.fun bonding-curve replay (protocol `agent-fun/r
 
 Measured momentum with fast, mechanical exits:
 
-- **Entries** only on young curves (30–300 slots old) that already proved real demand over the last 100 slots: at least 10 trades, 8 distinct buyers, 1.5 SOL of net inflow, sell pressure at most 45% of buy volume, price up 8–90%, no single buyer above 50% of the inflow, and the creator not selling.
-- **Sizing:** one modest 0.03 SOL stake per position (also capped by the harness at 1% of the curve's real SOL reserve), at most 5 open positions, no pyramiding, max 2 entries per mint with a 400-slot cooldown.
+- **Entries** only on young curves (30–300 slots old) that already proved real demand over the last 100 slots: at least 15 trades, 10 distinct buyers, 2.5 SOL of buy volume and 2.5 SOL of net inflow, sell pressure at most 35% of buy volume, price up 12–90%, no single buyer above 50% of the inflow, and the creator not selling.
+- **Sizing:** one modest 0.02 SOL stake per position (also capped by the harness at 1% of the curve's real SOL reserve), at most 5 open positions, no pyramiding, max 2 entries per mint with a 400-slot cooldown.
 - **Exits:** take profit +25%, stop loss −10%, trailing stop armed at +18% (exit 15% below peak), a flow-fade exit when recent net flow drops below −0.3 SOL, and a hard 300-slot time stop.
 - **Guardrail probes:** the ranking bar needs round trips of at least 0.01 SOL on 20+ coins; late in the run, if distinct traded coins lag, the bot places tiny 0.012 SOL probes on deep, active curves and closes them ~40 slots later.
+- **Performance:** all signal state is kept as rolling O(1) aggregates per mint (head-indexed trade queue for the 100-slot signal window and the 40-slot fade window, an incremental distinct-buyer map, binary search over price samples), so per-batch work is proportional to that batch's events — no rescanning of stored tape, no splice in the hot path. Locally graded at ~4.2–4.9 s of bot wall time per full execution on 1 CPU.
 
 The bot is deterministic (no clock, no randomness, no network): the same replay always produces the same orders.
 
